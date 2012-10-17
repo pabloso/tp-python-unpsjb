@@ -1,0 +1,3 @@
+dentro del TXT
+damian,pablo,lola
+ochi,alfa,beta

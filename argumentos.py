@@ -1,32 +1,62 @@
 # -*- coding: utf-8 -*-
 
-import os
+# version casi final falta revisar escritura
+
+#==============================================================================
+import os, sys
 import argparse
+import csv
 
+from string import Template
 
+#==============================================================================
+class Mi_t(Template):
+    'redefino template para que acepte $numero'
+    idpattern = '[0-9]*'
+#==============================================================================
 def obtencion_de_argumentos():
     'Funcion de parseo de de linea de comandos'
-    parser = argparse.ArgumentParser( description = 'Parseo de linea de comandos')
-    parser.add_argument('--template','-t',dest='temp', metavar='<NombreDeArchivo>', type=str, help='ruta al template')
-    parser.add_argument('--csv','-c',dest='csv', metavar='<NombreDeArchivo>', type=str, help='ruta al csv')
-    parser.add_argument('--documento','-d',dest='txt', metavar='<NombreDeArchivo>', type=str, help='documento destino')
+#==============================================================================
+    parser = argparse.ArgumentParser(description='''Parsea linea de comandos''')
+    
+    parser.add_argument('--template','-t',dest='temp', metavar='<NombredeArchivo>', type=str, help='Ruta al template')
+    parser.add_argument('--csv','-c',dest='csv', metavar='<NombredeArchivo>', type=str, help='Ruta al csv')
+    parser.add_argument('--documento','-d',dest='txt', metavar='<NombredeArchivo>', type=str, help='Ruta al documento destino')
     return parser.parse_args()
-    
-def validar_argumentos():
-#==============================================================================
-#     try:
-#         if os.path.isdir(argumentos.temp):
-#             os.path.join(argumentos.temp, parser.default)
-#==============================================================================
-#         if os.path.isfile(argumentos.temp):
-#         if os.path.isfile(argumentos.temp):
-#         if os.path.join(path1, path2):
-#         if os.path.isfile(argumentos.temp):
-#   probar para validar las rutas a los archivos          
+
+#REVISAR GUARDAR
+def guardar(nombre,num,ext,cosas):
+    archivo = open(nombre+num+ext,'w')
+    archivo.write(cosas)
+    archivo.close()
+
 def main():
-    args    =   obtencion_de_argumentos()
-    
-    
-    return  0
+    'Hago todo aca... modularizar?..nah..'
+    args = obtencion_de_argumentos()
+    if os.path.exists(args.temp) and os.path.isfile(args.temp):
+        if os.path.exists(args.csv) and os.path.isfile(args.csv):
+#si no me pasaste rutas a archivos, miro si los puedo abrir
+            try:
+                with open(args.csv, 'r') as archivo_csv:
+                    csv_memoria = csv.reader(archivo_csv)
+                    lista_diccionarios = []
+                    for fila_csv in csv_memoria:
+                        diccionario_tmp={}
+                        for elemento in range(len(fila_csv)):
+                            diccionario_tmp.update({str(elemento) : fila_csv[elemento]})
+                        lista_diccionarios.append(diccionario_tmp)
+                    with open(args.temp, 'r') as templeit_tmp:
+                        for linea in templeit_tmp:
+                            for c in range(len(lista_diccionarios)):
+                                s = Mi_t(linea)
+                                z = s.substitute(lista_diccionarios[c])
+                            print z,
+                            guardar(args.txt,'4','.txt',z)
+            except IOError as e:
+                print e.message
+            
+    return 0
+
+
 if __name__ == '__main__':
     main()
