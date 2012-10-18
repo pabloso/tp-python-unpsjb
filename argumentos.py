@@ -26,17 +26,16 @@ def obtencion_de_argumentos():
 	return parser.parse_args()
 #==============================================================================
 def validar_argumentos(args):
-	
 	'funcion que valida las rutas de los archivos y la ruta al directorio donde se guardaran los registros'
 	if os.path.exists(str(args.temp)) and os.path.isfile(str(args.temp)):
 		if os.path.exists(str(args.csv)) and os.path.isfile(str(args.csv)):
 			if not os.path.exists(str(args.dir)):
 				try:
-					os.mkdir(str(args.dir))
+					os.mkdir(str(args.dir)+'/')
 				except IOError as directorio:
 					print	'Imposible crear ruta %s' % str(args.dir)
 					sys.exit(1)
-			return bool(true)
+			return True
 #==============================================================================
 def csv_a_lista_de_diccionarios(ruta_al_csv):
 	'funcion que abre un archivo csv y devuelve una lista de diccionarios'
@@ -48,25 +47,23 @@ def csv_a_lista_de_diccionarios(ruta_al_csv):
 			for elemento in range(len(fila_csv)):
 				diccionario_tmp.update({str(elemento) : fila_csv[elemento]})
 			lista_diccionarios.append(diccionario_tmp)
-	return lista_diccionarios
-	
+	return lista_diccionarios	
 #==============================================================================
-def generador_de_registros(lista,ruta_al_templeit, directorio):
+def generador_de_registros(lista_de_diccionarios,ruta_al_templeit,directorio):
 	with open(ruta_al_templeit, 'r') as templeit_tmp:
-		cont = 0
 		for diccionario in lista_de_diccionarios: 
-			cont = cont+1             
-			s = str(args.dir)+'%d_%s.txt'%(cont,diccionario['2'],)
+			cadena_al_registro = directorio +'%s_%d.txt'%(diccionario['2'],lista_de_diccionarios.index(diccionario),)
 			try:
-				with open(s,'w') as registro:
+				with open(cadena_al_registro,'wt') as registro:
 					for linea in templeit_tmp:
-						s = Mi_templeit(linea)
-						z = s.substitute(c)
-						registro.writelines(z)
+						linea_pre_parseada = Mi_templeit(linea)
+						linea_parseada = linea_pre_parseada.substitute(diccionario)
+						registro.writelines(linea_parseada)
+					registro.writelines('\n')
 					templeit_tmp.seek(0)
 			except IOError as regis_error:
-				print 'error al escribir en el registro:%s', s
-#==============================================================================
+				print 'error al escribir en el registro:%s' % s, regis_error
+#============================================================================== 
 def main():
     'programa que recibe un archivo templeit y genera registros a partir de los campos del csv'
     args = obtencion_de_argumentos()
@@ -74,7 +71,7 @@ def main():
 		try:
 			lista_de_diccionarios = csv_a_lista_de_diccionarios(args.csv)
 			try:
-				generador_de_registros(lista_de_diccionarios, args.temp , str(args.dir))
+				generador_de_registros(lista_de_diccionarios,args.temp , args.dir)
 			except IOError as t:
 				print 'Error en templeit',t
 		except IOError as e:
