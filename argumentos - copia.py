@@ -10,7 +10,7 @@ import csv
 from string import Template
 
 #==============================================================================
-class Mi_templeit(Template):
+class Mi_tempeit(Template):
     'redefino template para que acepte $numero'
     idpattern = '[0-9]*'
 #==============================================================================
@@ -33,8 +33,8 @@ def guardar(nombre,num,ext,cosas):
 def main():
     'Hago todo aca... modularizar?..nah..'
     args = obtencion_de_argumentos()
-    if os.path.exists(str(args.temp)) and os.path.isfile(str(args.temp)):
-        if os.path.exists(str(args.csv)) and os.path.isfile(str(args.csv)):
+    if os.path.exists(str(args.temp) and os.path.isfile(str(args.temp))):
+        if os.path.exists(str(args.csv) and os.path.isfile(str(args.csv))):
             #si no me pasaste rutas a archivos, miro si los puedo abrir
             try:
                 with open(args.csv, 'r') as archivo_csv:
@@ -42,35 +42,22 @@ def main():
                     lista_diccionarios = []
                     for fila_csv in csv_memoria:
                         diccionario_tmp={}
-                        #print fila_csv
                         for elemento in range(len(fila_csv)):
                             diccionario_tmp.update({str(elemento) : fila_csv[elemento]})
-                            #diccionario_tmp.
                         lista_diccionarios.append(diccionario_tmp)
-                    try:                    
-                        with open(args.temp, 'r') as templeit_tmp:
-                            cont = 0
-                            if not os.path.exists('./pepin'):
-                                os.mkdir('./pepin')
-                            for c in lista_diccionarios: 
-                                cont = cont+1                             
-                                s = '%d_%s.txt'%(cont,c['2'],)
-                                #s='pepe.txt'
-
-                                archivo = open('./pepin/'+s,'w')
-                                for linea in templeit_tmp:
-                                    s = Mi_templeit(linea)
-                                    z = s.substitute(c) 
-                                    print z,
-                                    #archivo.write(z)
-                                    archivo.writelines(z)
-                                archivo.close()
-                                   
-                                templeit_tmp.seek(0)
-                    except IOError as t:
-                        print 'Error en templeit',t
+                        
+                    with open(args.temp, 'r') as templeit_tmp:
+                        for linea in templeit_tmp:
+                            #print lista_diccionarios
+                            for c in range(len(lista_diccionarios)):
+                                s = Mi_tempeit(linea)
+                                z = s.substitute(lista_diccionarios[c])
+                                print '1',z,
+                            #guardar(args.txt,'-','.txt',z)
+                            print '2',z,
+                            
             except IOError as e:
-                print 'Error en CSV',e
+                print e.message
             
     return 0
 
